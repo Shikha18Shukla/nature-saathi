@@ -1,6 +1,3 @@
-<img width="2000" height="840" alt="nature-saathi-cover" src="https://github.com/user-attachments/assets/15855f3a-2abc-4bf2-b3e1-ed2fe62de63d" />
-
-
 <div align="center">
 
 # 🌿 Nature Saathi
