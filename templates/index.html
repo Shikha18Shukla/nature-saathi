@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f2e9">
+  <meta name="description" content="An AI-powered outdoor learning companion that turns a walk into a real-world nature expedition.">
+  <title>{{ app_name }} — Take the curious way out</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</head>
+<body>
+  <svg class="motif-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <symbol id="motif-leaves" viewBox="0 0 240 180"><path d="M48 154C74 123 92 87 100 35M99 75c-27 2-42-12-43-34 23 0 39 11 43 34Zm8-15c4-25 20-39 44-39-2 22-17 37-44 39Zm-25 45c-24 1-40-12-43-33 22 1 38 12 43 33Zm22-13c4-23 20-36 43-35-2 21-17 34-43 35Z"/><path d="M156 156c11-22 17-42 20-65m0 25c-18-2-27-12-27-27 16 2 25 11 27 27Zm4-16c4-16 15-25 31-25-2 15-12 23-31 25Z"/></symbol>
+    <symbol id="motif-flowers" viewBox="0 0 240 180"><path d="M65 163c8-35 7-59 1-79m-1 50c-18-17-26-17-36-16 10 16 21 22 36 16Zm74 29c-1-31 5-56 19-77m-16 43c-20-12-29-10-38-6 13 13 24 16 38 6Z"/><g><circle cx="67" cy="73" r="8"/><path d="M67 53c-7-12 1-21 8-18 8 4 4 13 0 19 13-5 20 4 15 11-5 7-13 1-20-1 6 12 0 20-8 16-8-4-4-13 0-20-13 6-20 0-17-8 3-8 12-5 20 1-4-13 2-19 9-15"/></g><g><circle cx="160" cy="72" r="7"/><path d="M160 55c-6-10 1-17 7-14 6 3 3 10 0 15 11-4 16 3 12 9-4 6-10 1-16-1 5 10 0 16-7 13-7-3-3-10 0-16-10 5-16 0-13-7 3-7 10-4 17 1-3-10 2-15 8-12"/></g></symbol>
+    <symbol id="motif-birds" viewBox="0 0 240 180"><path d="M24 55c17-18 35-20 54-3 19-23 39-25 61-5-18-7-36-3-58 18-20-17-38-20-57-10Zm86 49c13-14 27-15 42-2 15-18 31-19 48-4-14-5-28-2-46 14-16-13-30-16-44-8Zm-76 29c9-10 20-11 31-2 11-12 22-13 35-3-10-4-21-2-33 9-12-10-22-11-33-4Z"/><path d="M183 42v13m-6-6h12"/></symbol>
+    <symbol id="motif-insects" viewBox="0 0 240 180"><path d="M117 67v71m0-55c-22-22-44-18-42 0 1 13 20 19 42 19m0-19c22-22 44-18 42 0-1 13-20 19-42 19m-1 7c-24-19-40-8-31 6 7 10 20 9 31 6m1-12c24-19 40-8 31 6-7 10-20 9-31 6m-6-51-10-11m22 11 10-11m-18 72-11 15m24-15 11 15"/><circle cx="117" cy="62" r="8"/></symbol>
+    <symbol id="motif-trees" viewBox="0 0 240 180"><path d="M55 160V82m0 35L28 91m27 12 24-27m0 84V57m0 46L61 82m18 31 25-30m48 77V72m0 40-24-25m24 12 25-31"/><path d="M30 93c-15-14-8-30 6-30 2-20 27-23 34-6 14-3 22 14 11 25m-3-24c-14-19 1-35 17-27 10-18 34-7 30 10 16 8 10 29-4 32m43 5c-11-17 3-31 16-25 9-17 31-8 28 8 15 8 8 26-6 28"/></symbol>
+    <symbol id="motif-soil" viewBox="0 0 240 180"><path d="M20 65c28-13 50 13 77 0s49 13 76 0 34-4 47 0M20 92c28-13 50 13 77 0s49 13 76 0 34-4 47 0M20 120c28-13 50 13 77 0s49 13 76 0 34-4 47 0M20 148c28-13 50 13 77 0s49 13 76 0 34-4 47 0"/><circle cx="61" cy="79" r="2"/><circle cx="145" cy="108" r="2"/><circle cx="193" cy="136" r="2"/></symbol>
+    <symbol id="motif-rocks" viewBox="0 0 240 180"><path d="m25 139 23-39 34 4 22 35Zm81 0 18-57 43-7 34 64Zm-42-53 18-35 28 12 8 32Zm90-17 18-32 20 9 8 26Z"/><path d="m51 105 31 5m45-21 42 1m-127 38 47 1m36-7 44-1"/></symbol>
+    <symbol id="motif-sounds" viewBox="0 0 240 180"><path d="M40 90c17-29 32-29 49 0s32 29 49 0 32-29 49 0m-172 0c24-47 48-47 72 0s48 47 72 0 48-47 72 0"/><circle cx="120" cy="90" r="7"/></symbol>
+    <symbol id="motif-colors" viewBox="0 0 240 180"><circle cx="75" cy="89" r="39" fill="#b7c09a"/><circle cx="121" cy="72" r="30" fill="#e3c17e"/><circle cx="153" cy="108" r="34" fill="#d5aa91"/><circle cx="103" cy="119" r="22" fill="#9db3ab"/><path d="M34 147h172"/></symbol>
+    <symbol id="motif-textures" viewBox="0 0 240 180"><path d="M39 53h162M39 67h162M39 81h162M39 95h162M39 109h162M39 123h162" stroke-dasharray="2 8"/><path d="M52 43v91m17-91v91m17-91v91m17-91v91m17-91v91m17-91v91m17-91v91m17-91v91" stroke-dasharray="2 8"/></symbol>
+    <symbol id="motif-animal-signs" viewBox="0 0 240 180"><path d="M58 63c-8-11-20-4-16 8l8 17c4 8 17 3 15-6Zm23-13c-9-9-20-1-14 10l10 15c5 7 17 0 13-8Zm68 13c8-11 20-4 16 8l-8 17c-4 8-17 3-15-6Zm-23-13c9-9 20-1 14 10l-10 15c-5 7-17 0-13-8ZM78 119c-9 0-14 8-10 16l9 15c4 7 14 4 15-4l1-18c0-6-7-10-15-9Zm85 0c9 0 14 8 10 16l-9 15c-4 7-14 4-15-4l-1-18c0-6 7-10 15-9Z"/></symbol>
+    <symbol id="motif-mixed-nature" viewBox="0 0 240 180"><path d="M31 142c27-35 41-72 44-111m0 39c-20 0-31-11-31-28 19 1 29 10 31 28Zm3-14c4-18 16-27 34-25-2 17-13 26-34 25Zm57 93c1-32 12-61 33-87m-25 48c-20-10-29-6-38 0 14 11 26 12 38 0Z"/><path d="M142 48c13-14 26-15 40-2 14-17 29-18 45-4-13-5-27-2-44 13-15-13-28-15-41-7Z"/><circle cx="174" cy="123" r="17"/><path d="M174 94v8m0 42v8m-29-29h8m42 0h8"/></symbol>
+  </svg>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Nature Saathi home">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M30.8 7.4C18.2 8.1 10 12.3 9 21.7c-.6 5.4 3.3 9 7.5 8.3 8.6-1.5 13.2-11.1 14.3-22.6Z"/><path d="M8 33c3.8-7.5 9.6-13.4 18.2-18"/></svg></span>
+      <span>nature<span class="brand-light">saathi</span></span>
+    </a>
+    <nav class="desktop-nav" aria-label="Main navigation">
+      <a href="#the-idea">The idea</a>
+      <a href="#how-it-works">How it works</a>
+    </nav>
+    <a class="header-cta" href="#expedition-builder">Plan a walk <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="eyebrow-dot"></span> A little more wonder, a little less screen</div>
+        <h1 id="hero-title">The world is<br>your <em>field guide.</em></h1>
+        <p class="hero-description">An AI-powered outdoor learning companion that turns a walk into a real-world nature expedition.</p>
+        <div class="hero-actions">
+          <a class="button-primary" id="start-button" href="#expedition-builder">
+            <span>Start an Expedition</span><span class="button-arrow" aria-hidden="true">↗</span>
+          </a>
+          <span class="walk-note"><span aria-hidden="true">✳</span> Made for the outside</span>
+        </div>
+        <p id="start-status" class="action-status" role="status" aria-live="polite"></p>
+        <div class="hero-proof"><span class="proof-line"></span><span>Curiosity is closer than you think</span></div>
+      </div>
+
+      <div class="hero-art" aria-label="Illustration of a sunlit meadow and winding trail">
+        <span class="art-rays" aria-hidden="true"></span>
+        <div class="art-sun" aria-hidden="true"></div>
+        <div class="art-grain"></div>
+        <svg class="art-cloud cloud-one" viewBox="0 0 100 42" aria-hidden="true"><path d="M17 31h59a12 12 0 0 0 0-24 18 18 0 0 0-34-1A14 14 0 0 0 17 31Z"/></svg>
+        <svg class="art-cloud cloud-two" viewBox="0 0 100 42" aria-hidden="true"><path d="M17 31h59a12 12 0 0 0 0-24 18 18 0 0 0-34-1A14 14 0 0 0 17 31Z"/></svg>
+        <div class="art-label label-top"><span class="label-icon">✳</span><span>Notice something<br><strong>new today</strong></span></div>
+        <div class="art-hill hill-back"></div>
+        <div class="art-hill hill-mid"></div>
+        <svg class="art-birds" viewBox="0 0 620 500" aria-hidden="true"><path class="bird bird-one" d="M0 9q12-12 24 0 12-12 24 0M68 26q10-10 20 0 10-10 20 0"/><path class="bird bird-two" d="M0 8q10-10 20 0 10-10 20 0"/></svg>
+        <div class="art-hill hill-front"></div>
+        <svg class="art-trail" viewBox="0 0 620 500" preserveAspectRatio="none" aria-hidden="true"><path d="M232 510c72-83 188-114 135-205-30-51-103-69-47-153 24-36 54-75 53-152"/></svg>
+        <div class="flower flower-one"><span></span></div><div class="flower flower-two"><span></span></div>
+        <span class="art-particle particle-one" aria-hidden="true"></span><span class="art-particle particle-two" aria-hidden="true"></span><span class="art-particle particle-three" aria-hidden="true"></span>
+        <div class="art-label label-bottom"><span class="label-icon label-leaf">↗</span><span>Take the<br><strong>curious way out</strong></span></div>
+        <div class="art-caption"><span class="caption-dot"></span> Somewhere just around the corner</div>
+      </div>
+      <div class="hero-scroll" aria-hidden="true"><span></span> SCROLL TO EXPLORE</div>
+    </section>
+
+    <section class="expedition-section" id="expedition-builder" aria-labelledby="builder-title" data-theme="mixed-nature">
+      <div class="theme-scene theme-scene-builder" data-theme-scene="builder" aria-hidden="true"><svg viewBox="0 0 240 180"><use href="#motif-mixed-nature"></use></svg><span class="theme-scene-label">A world waiting to be noticed</span></div>
+      <div class="section-index">01 <span>/ YOUR EXPEDITION</span></div>
+      <div class="builder-heading" data-reveal>
+        <p class="builder-overline">A WALK WITH A LITTLE WONDER</p>
+        <h2 id="builder-title">Where will your<br><em>curiosity take you?</em></h2>
+        <p>Choose a little time. We’ll give you something worth noticing.</p>
+      </div>
+
+      <form id="mission-form" class="mission-form">
+        <fieldset class="duration-fieldset choice-group">
+          <legend><span class="choice-kicker">TIME</span><span>How long do you have?</span></legend>
+          <div class="duration-options">
+            <label class="duration-option"><input type="radio" name="duration_minutes" value="15"><span>15 <small>min</small></span></label>
+            <label class="duration-option"><input type="radio" name="duration_minutes" value="30" checked><span>30 <small>min</small></span></label>
+            <label class="duration-option"><input type="radio" name="duration_minutes" value="45"><span>45 <small>min</small></span></label>
+            <label class="duration-option"><input type="radio" name="duration_minutes" value="60"><span>60 <small>min</small></span></label>
+          </div>
+        </fieldset>
+        <fieldset class="choice-group pace-group">
+          <legend><span class="choice-kicker">PACE</span><span>Choose your pace</span></legend>
+          <div class="pace-options">
+            <label class="choice-tile"><input type="radio" name="difficulty" value="Beginner" checked><span>Beginner</span></label>
+            <label class="choice-tile"><input type="radio" name="difficulty" value="Explorer"><span>Explorer</span></label>
+            <label class="choice-tile"><input type="radio" name="difficulty" value="Naturalist"><span>Naturalist</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="choice-group interest-group">
+          <legend><span class="choice-kicker">WHAT CATCHES YOUR EYE?</span><span>Choose a starting point</span></legend>
+          <div class="interest-options" data-reveal>
+            <label class="choice-tile"><input type="radio" name="interest" value="Leaves"><span class="interest-specimen"><svg viewBox="0 0 240 180" aria-hidden="true"><use href="#motif-leaves"></use></svg><span>Leaves</span></span></label>
+            <label class="choice-tile"><input type="radio" name="interest" value="Flowers"><span class="interest-specimen"><svg viewBox="0 0 240 180" aria-hidden="true"><use href="#motif-flowers"></use></svg><span>Flowers</span></span></label>
+            <label class="choice-tile"><input type="radio" name="interest" value="Birds"><span class="interest-specimen"><svg viewBox="0 0 240 180" aria-hidden="true"><use href="#motif-birds"></use></svg><span>Birds</span></span></label>
+            <label class="choice-tile"><input type="radio" name="interest" value="Insects"><span class="interest-specimen"><svg viewBox="0 0 240 180" aria-hidden="true"><use href="#motif-insects"></use></svg><span>Insects</span></span></label>
+            <label class="choice-tile"><input type="radio" name="interest" value="Trees"><span class="interest-specimen"><svg viewBox="0 0 240 180" aria-hidden="true"><use href="#motif-trees"></use></svg><span>Trees</span></span></label>
+            <label class="choice-tile"><input type="radio" name="interest" value="Soil"><span class="interest-specimen"><svg viewBox="0 0 240 180" aria-hidden="true"><use href="#motif-soil"></use></svg><span>Soil</span></span></label>
+            <label class="choice-tile"><input type="radio" name="interest" value="Rocks"><span class="interest-specimen"><svg viewBox="0 0 240 180" aria-hidden="true"><use href="#motif-rocks"></use></svg><span>Rocks</span></span></label>
+            <label class="choice-tile"><input type="radio" name="interest" value="Sounds"><span class="interest-specimen"><svg viewBox="0 0 240 180" aria-hidden="true"><use href="#motif-sounds"></use></svg><span>Sounds</span></span></label>
+            <label class="choice-tile"><input type="radio" name="interest" value="Colors"><span class="interest-specimen"><svg viewBox="0 0 240 180" aria-hidden="true"><use href="#motif-colors"></use></svg><span>Colors</span></span></label>
+            <label class="choice-tile"><input type="radio" name="interest" value="Textures"><span class="interest-specimen"><svg viewBox="0 0 240 180" aria-hidden="true"><use href="#motif-textures"></use></svg><span>Textures</span></span></label>
+            <label class="choice-tile"><input type="radio" name="interest" value="Animal Signs"><span class="interest-specimen"><svg viewBox="0 0 240 180" aria-hidden="true"><use href="#motif-animal-signs"></use></svg><span>Animal Signs</span></span></label>
+            <label class="choice-tile"><input type="radio" name="interest" value="Mixed Nature" checked><span class="interest-specimen"><svg viewBox="0 0 240 180" aria-hidden="true"><use href="#motif-mixed-nature"></use></svg><span>Mixed Nature</span></span></label>
+          </div>
+        </fieldset>
+        <button class="button-primary generate-button" id="generate-button" type="submit">
+          <span>Make my expedition</span><span class="button-arrow" aria-hidden="true">↗</span>
+        </button>
+        <p class="privacy-note"><span aria-hidden="true">✳</span> Your guide is local. The best part happens away from the screen.</p>
+      </form>
+
+      <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
+      <section id="mission-results" class="mission-results" aria-live="polite" data-theme="mixed-nature" hidden>
+        <div class="results-topline"><span class="results-kicker">02 / YOUR FIELD GUIDE</span><span class="results-meta" id="results-meta"></span></div>
+        <div class="field-guide-hero">
+          <div class="field-guide-copy" data-reveal><p class="field-guide-whisper">Today, look a little closer.</p><h2 class="results-title" id="results-title"></h2><p class="results-intro" id="results-intro"></p></div>
+          <div class="theme-scene theme-scene-guide" data-theme-scene="guide" aria-hidden="true"><svg viewBox="0 0 240 180"><use href="#motif-mixed-nature"></use></svg><span class="theme-scene-label" id="guide-theme-label">MIXED NATURE</span></div>
+        </div>
+        <p class="safety-note" id="results-safety"></p>
+        <ol class="mission-list" id="mission-list"></ol>
+        <p class="started-status" id="started-status" role="status" aria-live="polite"></p>
+        <div class="results-actions">
+          <button class="button-primary" id="start-expedition" type="button"><span>Start Expedition</span><span class="button-arrow" aria-hidden="true">↗</span></button>
+          <button class="button-secondary" id="regenerate-expedition" type="button">Regenerate Expedition <span aria-hidden="true">↻</span></button>
+          <button class="button-text" id="back-to-builder" type="button">← Back</button>
+        </div>
+      </section>
+
+      <section id="expedition-run" class="expedition-run" aria-labelledby="run-title" data-theme="mixed-nature" hidden>
+        <div class="results-topline"><span class="results-kicker">03 / OUTSIDE NOW</span><span class="results-meta" id="run-title"></span></div>
+        <div class="run-progress-wrap"><label id="run-progress-label" for="run-progress"></label><progress id="run-progress" value="0" max="1">0%</progress></div>
+        <article class="run-card">
+          <div class="theme-scene theme-scene-run" data-theme-scene="run" aria-hidden="true"><svg viewBox="0 0 240 180"><use href="#motif-mixed-nature"></use></svg></div>
+          <div class="run-mission-mark" id="run-marker"><span id="run-number">01</span><span id="run-total">/ 03</span></div>
+          <div class="mission-card-top"><span class="mission-number">YOUR NEXT NOTICING</span><span class="evidence-tag" id="run-evidence"></span></div>
+          <h2 id="run-mission-title"></h2>
+          <p class="run-task" id="run-mission-task"></p>
+          <div class="run-detail"><h3>Look for</h3><p id="run-mission-observe"></p></div>
+          <div class="run-detail"><h3>Learn</h3><p id="run-mission-learn"></p></div>
+          <div class="phone-away-pause" aria-label="Put your phone away and explore"><span>LOOK UP</span><strong>Put your phone away.</strong><span>The world is waiting.</span></div>
+          <p class="phone-away-note" id="run-reminder" role="status" aria-live="polite"></p>
+        </article>
+        <ol class="outside-rhythm" aria-label="Expedition rhythm"><li>Read</li><li>Phone away</li><li>Explore</li><li>Return</li></ol>
+        <div class="run-actions">
+          <button class="button-primary" id="mark-complete" type="button">Mark Complete</button>
+          <button class="button-secondary" id="next-mission" type="button" disabled>Next Mission <span aria-hidden="true">→</span></button>
+        </div>
+        <p class="run-footer-note">No need to hurry back. The next prompt will be here when you are ready.</p>
+      </section>
+
+      <section id="expedition-completion" class="completion-view" aria-labelledby="completion-title" data-theme="mixed-nature" hidden>
+        <div class="completion-panel">
+        <div class="theme-scene theme-scene-complete" data-theme-scene="complete" aria-hidden="true"><svg viewBox="0 0 240 180"><use href="#motif-mixed-nature"></use></svg></div>
+        <p class="results-kicker">04 / BACK FROM OUTSIDE</p>
+        <div class="completion-mark" aria-hidden="true">✳</div>
+        <h2 id="completion-title">You noticed<br><em>something today.</em></h2>
+        <p class="completion-copy">A small journey, carried home in what caught your attention.</p>
+        <p class="completion-count" id="completion-count"></p>
+        <p class="completion-meta" id="completion-meta"></p>
+        <ol class="completion-fieldnotes" id="completion-fieldnotes" aria-label="Completed expedition field notes"></ol>
+        <div class="completion-actions">
+          <button class="button-primary" id="review-discoveries" type="button">Review What I Discovered</button>
+          <button class="button-secondary" id="start-another" type="button">Start Another Expedition <span aria-hidden="true">↻</span></button>
+        </div>
+        </div>
+      </section>
+
+      <section id="discovery-review" class="discovery-review" aria-labelledby="discovery-title" hidden>
+        <p class="results-kicker">YOUR FIELD NOTES</p>
+        <h2 id="discovery-title">What you noticed</h2>
+        <p class="review-note">A reminder of the prompts you completed. Your own discoveries stay yours.</p>
+        <ol class="mission-list" id="discovery-list"></ol>
+        <button class="button-text" id="back-to-completion" type="button">← Back to your finish</button>
+      </section>
+    </section>
+
+    <section class="idea-section" id="the-idea" data-reveal-section>
+      <div class="section-index">01 <span>/ THE IDEA</span></div>
+      <div class="idea-content" data-reveal>
+        <h2>Put wonder in<br>your <span>way home.</span></h2>
+        <p>Nature Saathi gives your next walk a gentle nudge in a new direction. Get a simple idea to explore, put your phone away, and let the real world be the interesting part.</p>
+        <div class="idea-note"><span aria-hidden="true">✳</span> The best discoveries happen with your eyes up.</div>
+      </div>
+      <div class="idea-aside idea-illustration" data-reveal data-theme-scene="idea" aria-hidden="true"><div class="idea-sun"></div><svg class="idea-path" viewBox="0 0 300 300"><path d="M40 314c28-64 134-73 111-139-15-43-61-48-38-92C127 56 166 39 177-10"/></svg><svg class="idea-botanical" viewBox="0 0 240 180"><use href="#motif-mixed-nature"></use></svg><span class="idea-compass">N<br><i>✳</i></span><span class="idea-marker">A GOOD PLACE TO BEGIN</span></div>
+    </section>
+
+    <section class="steps-section" id="how-it-works" aria-labelledby="steps-title" data-reveal-section>
+      <div class="theme-scene theme-scene-rhythm" data-theme-scene="rhythm" aria-hidden="true"><svg viewBox="0 0 240 180"><use href="#motif-mixed-nature"></use></svg></div>
+      <div class="steps-heading"><div class="section-index">02 <span>/ THE RHYTHM</span></div><h2 id="steps-title">A good walk has<br><em>a little direction.</em></h2></div>
+      <div class="steps-grid" data-reveal>
+        <svg class="trail-route" viewBox="0 0 1000 160" preserveAspectRatio="none" aria-hidden="true"><path class="route-desktop" d="M70 112 C240 112 240 47 405 55 S600 125 712 84 S850 48 950 62"/><path class="route-mobile" d="M54 5 C54 80 31 88 39 157 S75 240 52 320"/></svg>
+        <article class="step-card" data-reveal><span class="step-number">01</span><div class="step-symbol symbol-sun" aria-hidden="true"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="6"/><path d="M20 2v8m0 20v8M2 20h8m20 0h8M7 7l6 6m14 14 6 6m0-26-6 6M13 27l-6 6"/></svg></div><h3>Get a prompt</h3><p>A small, thoughtful invitation to notice something outside.</p><span class="step-tag">THE SPARK</span></article>
+        <article class="step-card" data-reveal><span class="step-number">02</span><div class="step-symbol symbol-eye" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M3 20s6-11 17-11 17 11 17 11-6 11-17 11S3 20 3 20Z"/><circle cx="20" cy="20" r="4"/></svg></div><h3>Go look</h3><p>Put the phone away. Follow your curiosity at your own pace.</p><span class="step-tag">THE OUTSIDE PART</span></article>
+        <article class="step-card" data-reveal><span class="step-number">03</span><div class="step-symbol symbol-leaf" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M32 7C18 8 9 13 9 23c0 6 4 9 9 7C27 27 31 18 32 7ZM7 34c5-8 11-14 20-20"/></svg></div><h3>Bring back a story</h3><p>Carry home a new question, a small discovery, a way of seeing.</p><span class="step-tag">THE DISCOVERY</span></article>
+      </div>
+    </section>
+
+    <section class="closing-section"><div class="closing-flower" aria-hidden="true">✳</div><p>Your screen can wait.</p><h2>There’s a whole<br>world <em>out there.</em></h2><a href="#main" class="closing-link">Let’s go find it <span aria-hidden="true">↑</span></a></section>
+  </main>
+  <footer class="site-footer"><a class="brand footer-brand" href="/">nature<span class="brand-light">saathi</span></a><span>Built for curious walks and open skies.</span><span>Take only memories. Leave nature as you found it.</span></footer>
+</body>
+</html>
