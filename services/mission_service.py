@@ -13,7 +13,27 @@ INTERESTS = (
     "Leaves", "Flowers", "Birds", "Insects", "Trees", "Soil", "Rocks",
     "Sounds", "Colors", "Textures", "Animal Signs", "Mixed Nature",
 )
-EVIDENCE_TYPES = ("observation", "photo", "count", "sound")
+EVIDENCE_TYPES = ("photo", "reflection", "optional")
+
+# Mapping from legacy evidence types to normalized types
+_LEGACY_EVIDENCE_MAP = {
+    "photo": "photo",
+    "observation": "reflection",
+    "count": "reflection",
+    "sound": "reflection",
+}
+
+
+def _normalize_evidence_type(value):
+    """Normalize evidence type to a safe, predictable value.
+
+    Legacy types (observation, count, sound) are mapped to "reflection".
+    Invalid or missing types fall back to "optional" so the expedition
+    is never blocked by an unrecognized evidence type.
+    """
+    if not isinstance(value, str):
+        return "optional"
+    return _LEGACY_EVIDENCE_MAP.get(value.strip().lower(), "optional")
 
 MISSION_RESPONSE_SCHEMA = {
     "type": "object",
@@ -153,14 +173,18 @@ def validate_mission_response(data, duration_minutes, difficulty, interest):
             raise MissionValidationError(f"{location} must be an object.")
         mission_fields = {"id", "title", "task", "observe", "learn", "evidence_type", "difficulty"}
         if mission_fields - mission.keys():
-            raise MissionValidationError(f"{location} is missing required fields.")
+            # Normalize missing evidence_type to "optional" before rejecting other missing fields
+            if "evidence_type" not in mission:
+                mission["evidence_type"] = "optional"
+            else:
+                raise MissionValidationError(f"{location} is missing required fields.")
         if mission.keys() - mission_fields:
             raise MissionValidationError(f"{location} contains unsupported fields.")
         mission_id = mission["id"]
         if type(mission_id) is not int or mission_id < 1 or mission_id in seen_ids:
             raise MissionValidationError(f"{location}.id must be a unique positive integer.")
         seen_ids.add(mission_id)
-        evidence_type = mission["evidence_type"]
+        evidence_type = _normalize_evidence_type(mission["evidence_type"])
         if evidence_type not in EVIDENCE_TYPES:
             raise MissionValidationError(f"{location}.evidence_type is unsupported.")
         level = mission["difficulty"]
@@ -196,6 +220,28 @@ class MissionGenerationService:
         )
         try:
             raw_response = self.ollama_service.generate(prompt, format_schema=MISSION_RESPONSE_SCHEMA)
+        except OllamaError:
+            raise
+
+        try:
+            parsed = json.loads(raw_response)
+        except (TypeError, json.JSONDecodeError) as exc:
+            raise MissionValidationError("Ollama returned invalid JSON. Please try generating the expedition again.") from exc
+        return validate_mission_response(parsed, duration_minutes, difficulty, interest)
+
+    def generate_text_only(self, duration_minutes, difficulty, interest):
+        """Generate expedition using text-only fallback (no JSON schema).
+
+        Used when the primary model fails due to multimodal/CLIP loading issues.
+        """
+        _validate_request(duration_minutes, difficulty, interest)
+        prompt = MISSION_GENERATION_PROMPT.format(
+            duration_minutes=duration_minutes,
+            difficulty=difficulty,
+            interest=interest,
+        )
+        try:
+            raw_response = self.ollama_service.generate(prompt)
         except OllamaError:
             raise
 

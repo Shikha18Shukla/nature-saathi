@@ -20,11 +20,8 @@ class OllamaService:
         self.model = model
         self.timeout = timeout
 
-    def generate(self, prompt, format_schema=None):
-        """Generate text from a prompt using the configured local model."""
-        payload_data = {"model": self.model, "prompt": prompt, "stream": False}
-        if format_schema is not None:
-            payload_data["format"] = format_schema
+    def _post_payload(self, payload_data):
+        """Send a JSON payload to Ollama's generate API and return the response text."""
         payload = json.dumps(payload_data).encode("utf-8")
         request = Request(
             f"{self.base_url}/api/generate",
@@ -65,3 +62,22 @@ class OllamaService:
         if not isinstance(text, str):
             raise OllamaError("Ollama response did not contain generated text.")
         return text
+
+    def generate(self, prompt, format_schema=None):
+        """Generate text from a prompt using the configured local model."""
+        payload_data = {"model": self.model, "prompt": prompt, "stream": False}
+        if format_schema is not None:
+            payload_data["format"] = format_schema
+        return self._post_payload(payload_data)
+
+    def generate_with_image(self, prompt, image_base64, format_schema=None):
+        """Generate text from a prompt and a base64-encoded image using the configured local model."""
+        payload_data = {
+            "model": self.model,
+            "prompt": prompt,
+            "images": [image_base64],
+            "stream": False,
+        }
+        if format_schema is not None:
+            payload_data["format"] = format_schema
+        return self._post_payload(payload_data)

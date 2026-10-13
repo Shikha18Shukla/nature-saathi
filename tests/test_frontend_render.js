@@ -39,6 +39,10 @@ const selectorNames = [
   "#run-evidence", "#run-number", "#run-total", "#run-marker", ".run-card", "#mark-complete", "#next-mission",
   "#run-title", "#run-reminder", "#completion-count", "#completion-meta", "#completion-fieldnotes", "#discovery-list",
   "#guide-theme-label", "#review-discoveries", "#back-to-completion", "#start-another", "#expedition-builder",
+  "#evidence-area", "#evidence-instruction", "#evidence-photo", "#evidence-reflection",
+  "#photo-input", "#photo-capture", "#photo-preview", "#photo-preview-img", "#submit-photo", "#evidence-status",
+  "#reflection-input", "#submit-reflection", "#reflection-status",
+  "#vision-result", "#vision-content", "#replace-photo",
 ];
 const themes = ["Leaves", "Flowers", "Birds", "Insects", "Trees", "Soil", "Rocks", "Sounds", "Colors", "Textures", "Animal Signs", "Mixed Nature"];
 const slugs = ["leaves", "flowers", "birds", "insects", "trees", "soil", "rocks", "sounds", "colors", "textures", "animal-signs", "mixed-nature"];
@@ -48,7 +52,7 @@ const themeScenes = ["builder", "guide", "run", "complete", "idea", "rhythm"].ma
 const expedition = {
   title: "A field note <script> tag", theme: "Birds", duration_minutes: 30, difficulty: "Beginner",
   intro: "A gentle walk to notice bird sounds.", safety_note: "Stay on public paths and observe wildlife from a distance.",
-  missions: [1, 2, 3].map((id) => ({ id, title: `Notice ${id}`, task: "Put your phone away and look around.", observe: "Notice a pattern.", learn: "Repeated observations can reveal a pattern.", evidence_type: "observation", difficulty: 1 })),
+  missions: [1, 2, 3].map((id) => ({ id, title: `Notice ${id}`, task: "Put your phone away and look around.", observe: "Notice a pattern.", learn: "Repeated observations can reveal a pattern.", evidence_type: "optional", difficulty: 1 })),
 };
 const storage = new Map();
 
@@ -69,10 +73,11 @@ function makeHarness(responseData = expedition) {
       createElement: (tag) => new FakeElement(tag),
       createTextNode: (text) => ({ textContent: text }),
     },
-    window: { matchMedia: () => ({ matches: false }) },
+    window: { matchMedia: () => ({ matches: false }), addEventListener: () => {} },
     IntersectionObserver: class { constructor(callback) { this.callback = callback; } observe(target) { this.callback([{ target, isIntersecting: true }], this); } unobserve() {} },
     setTimeout: (callback) => callback(),
     sessionStorage: { getItem: (key) => storage.get(key) || null, setItem: (key, value) => storage.set(key, value), removeItem: (key) => storage.delete(key) },
+    URL: { createObjectURL: () => "blob:fake-url", revokeObjectURL: () => {} },
     FormData: class { get(name) { return ({ duration_minutes: "30", difficulty: "Beginner", interest: "Birds" })[name]; } },
     fetch: async (url, options) => {
       assert.equal(url, "/api/missions/generate"); assert.equal(options.method, "POST");
@@ -163,5 +168,131 @@ function makeHarness(responseData = expedition) {
   assert.equal(storage.size, 0);
   assert.match(ui.get("#form-status").textContent, /could not be restored/);
 
-  console.log("Frontend theme system (12 interests), editorial screens, mission flow, and reduced-motion/overflow hooks: PASS");
+  // --- Evidence flow tests ---
+  // Test 1: Photo mission blocks completion without evidence
+  const photoExp = {
+    title: "Photo walk", theme: "Leaves", duration_minutes: 30, difficulty: "Beginner",
+    intro: "A walk to notice leaves.", safety_note: "Stay on paths.",
+    missions: [
+      { id: 1, title: "Leaf shapes", task: "Put your phone away and look at leaves.", observe: "Notice shapes.", learn: "Leaves vary.", evidence_type: "photo", difficulty: 1 },
+      { id: 2, title: "Leaf colors", task: "Put your phone away and notice colors.", observe: "Notice variations.", learn: "Color matters.", evidence_type: "optional", difficulty: 1 },
+      { id: 3, title: "Leaf textures", task: "Put your phone away and notice textures.", observe: "Notice patterns.", learn: "Texture helps.", evidence_type: "optional", difficulty: 1 },
+    ],
+  };
+  storage.clear();
+  ui = makeHarness(photoExp);
+  await ui.get("#mission-form").listeners.submit({ preventDefault() {} });
+  ui.get("#start-expedition").listeners.click();
+  assert.equal(ui.get("#evidence-photo").hidden, false);
+  assert.equal(ui.get("#mark-complete").disabled, true);
+  assert.match(ui.get("#mark-complete").textContent, /submit photo/i);
+
+  // Test 2: Photo submission enables completion
+  ui.context.fetch = async (url) => {
+    if (url === "/api/evidence/photo") return { ok: true, json: async () => ({ status: "ok" }) };
+    if (url === "/api/vision/analyze") return { ok: true, json: async () => ({ status: "unavailable" }) };
+    return { ok: true, json: async () => photoExp };
+  };
+  // Simulate successful photo submission by calling the submit handler
+  // The submit handler checks photoMemory; we bypass selection by setting state directly
+  // This tests the completion logic: evidence submitted -> can complete
+  const fakePhoto = { name: "leaf.jpg", type: "image/jpeg", size: 1024 };
+  ui.get("#photo-input").listeners.change({ target: { files: [fakePhoto] } });
+  // Check if photo selection worked
+  if (!ui.get("#submit-photo").disabled) {
+    ui.get("#submit-photo").listeners.click();
+    await new Promise((r) => setTimeout(r, 10));
+  }
+  assert.equal(ui.get("#mark-complete").disabled, false);
+  ui.get("#mark-complete").listeners.click();
+  assert.equal(ui.get("#run-progress").value, 1);
+  assert.equal(ui.get("#next-mission").disabled, false);
+
+  // Test 3: Reflection mission requires non-empty submitted reflection
+  const refExp = {
+    title: "Reflection walk", theme: "Sounds", duration_minutes: 30, difficulty: "Beginner",
+    intro: "A walk to notice sounds.", safety_note: "Stay on paths.",
+    missions: [
+      { id: 1, title: "Listen", task: "Put your phone away and listen.", observe: "Notice sounds.", learn: "Sounds tell stories.", evidence_type: "reflection", difficulty: 1 },
+      { id: 2, title: "Count", task: "Put your phone away and count.", observe: "Notice patterns.", learn: "Patterns reveal.", evidence_type: "optional", difficulty: 1 },
+      { id: 3, title: "Changes", task: "Put your phone away and notice changes.", observe: "Notice shifts.", learn: "Change is constant.", evidence_type: "optional", difficulty: 1 },
+    ],
+  };
+  storage.clear();
+  ui = makeHarness(refExp);
+  await ui.get("#mission-form").listeners.submit({ preventDefault() {} });
+  ui.get("#start-expedition").listeners.click();
+  assert.equal(ui.get("#evidence-reflection").hidden, false);
+  assert.equal(ui.get("#mark-complete").disabled, true);
+
+  // Empty reflection fails
+  ui.context.fetch = async (url) => {
+    if (url === "/api/evidence/reflection") return { ok: false, json: async () => ({ error: { code: "invalid_reflection", message: "Write something." } }) };
+    return { ok: true, json: async () => refExp };
+  };
+  ui.get("#reflection-input").value = "   ";
+  ui.get("#submit-reflection").listeners.click();
+  await new Promise((r) => setTimeout(r, 10));
+  assert.equal(ui.get("#mark-complete").disabled, true);
+
+  // Valid reflection succeeds
+  ui.context.fetch = async (url) => {
+    if (url === "/api/evidence/reflection") return { ok: true, json: async () => ({ status: "ok" }) };
+    return { ok: true, json: async () => refExp };
+  };
+  ui.get("#reflection-input").value = "I heard birds.";
+  ui.get("#submit-reflection").listeners.click();
+  await new Promise((r) => setTimeout(r, 10));
+  assert.equal(ui.get("#mark-complete").disabled, false);
+  ui.get("#mark-complete").listeners.click();
+  assert.equal(ui.get("#run-progress").value, 1);
+
+  // Test 4: Vision failure does not block completion
+  const photoExp2 = {
+    title: "Photo walk 2", theme: "Flowers", duration_minutes: 30, difficulty: "Beginner",
+    intro: "A walk to notice flowers.", safety_note: "Stay on paths.",
+    missions: [
+      { id: 1, title: "Colors", task: "Put your phone away and look.", observe: "Notice colors.", learn: "Flowers attract.", evidence_type: "photo", difficulty: 1 },
+      { id: 2, title: "Shapes", task: "Put your phone away and notice.", observe: "Notice shapes.", learn: "Shape aids.", evidence_type: "optional", difficulty: 1 },
+      { id: 3, title: "Scents", task: "Put your phone away and notice.", observe: "Notice scents.", learn: "Scent attracts.", evidence_type: "optional", difficulty: 1 },
+    ],
+  };
+  storage.clear();
+  ui = makeHarness(photoExp2);
+  await ui.get("#mission-form").listeners.submit({ preventDefault() {} });
+  ui.get("#start-expedition").listeners.click();
+  ui.context.fetch = async (url) => {
+    if (url === "/api/evidence/photo") return { ok: true, json: async () => ({ status: "ok" }) };
+    if (url === "/api/vision/analyze") return { ok: false, json: async () => ({ error: { message: "fail" } }) };
+    return { ok: true, json: async () => photoExp2 };
+  };
+  const fakePhoto2 = { name: "flower.jpg", type: "image/jpeg", size: 1024 };
+  ui.get("#photo-input").listeners.change({ target: { files: [fakePhoto2] } });
+  if (!ui.get("#submit-photo").disabled) {
+    ui.get("#submit-photo").listeners.click();
+    await new Promise((r) => setTimeout(r, 10));
+  }
+  // Vision failed but photo succeeded, so completion should be enabled
+  assert.equal(ui.get("#mark-complete").disabled, false);
+  ui.get("#mark-complete").listeners.click();
+  assert.equal(ui.get("#run-progress").value, 1);
+
+  // Test 5: No image data in browser storage
+  const storedRaw = storage.get("natureSaathi.expedition.v1");
+  if (storedRaw) {
+    const stored = JSON.parse(storedRaw);
+    assert.equal(stored.evidence?.[1]?.type, "photo");
+    assert.equal(stored.evidence?.[1]?.submitted, true);
+    assert.ok(!storedRaw.includes("base64"), "No base64 in storage");
+    assert.ok(!storedRaw.includes("data:image"), "No data URLs in storage");
+    assert.ok(!storedRaw.includes("blob:"), "No blob URLs in storage");
+  }
+
+  // Test 6: Reset clears evidence
+  ui.get("#next-mission").listeners.click();
+  ui.get("#start-another").listeners.click();
+  assert.equal(storage.size, 0);
+  assert.equal(ui.get("#mission-form").hidden, false);
+
+  console.log("Frontend theme system (12 interests), editorial screens, mission flow, evidence flow, and reduced-motion/overflow hooks: PASS");
 })().catch((error) => { console.error(error); process.exitCode = 1; });

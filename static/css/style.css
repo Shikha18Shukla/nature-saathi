@@ -594,3 +594,23 @@ svg{max-width:100%}
 #mission-results .fieldnote-card.is-visible h3,#mission-results .fieldnote-card.is-visible .mission-task,#mission-results .fieldnote-card.is-visible .mission-detail{opacity:1;transform:none}
 @media(max-width:600px){#expedition-builder:after{width:72vw;right:-29%;top:6%}}
 @media(prefers-reduced-motion:reduce){#expedition-builder:after{animation:none!important;transform:none!important}.motion-ready #mission-results .fieldnote-card:not(.is-visible) h3,.motion-ready #mission-results .fieldnote-card:not(.is-visible) .mission-task,.motion-ready #mission-results .fieldnote-card:not(.is-visible) .mission-detail{opacity:1!important;transform:none!important}}
+
+/* Evidence area: photo and reflection submission */
+.evidence-area{position:relative;z-index:1;max-width:680px;margin:26px 0 0;padding:20px 22px;border:1px solid rgba(37,58,48,.14);border-radius:2px;background:rgba(251,250,245,.7)}
+.evidence-instruction{font-size:12px;color:#526457;margin:0 0 14px;line-height:1.6}
+.evidence-photo,.evidence-reflection{display:grid;gap:12px}
+.photo-controls{display:flex;gap:10px;flex-wrap:wrap}
+.photo-picker-label,.photo-capture-label{margin:0;cursor:pointer}
+.photo-picker-label:hover,.photo-capture-label:hover{text-decoration:underline}
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.photo-preview{display:grid;gap:10px;justify-items:start}
+.photo-preview img{max-width:280px;max-height:200px;border-radius:2px;border:1px solid rgba(37,58,48,.12);object-fit:cover}
+#reflection-input{width:100%;border:1px solid #d6dace;border-radius:2px;background:#fbfaf5;color:#435648;font:400 13px var(--sans);padding:10px 12px;resize:vertical;min-height:64px}
+#reflection-input:focus-visible{outline:3px solid #c99b43;outline-offset:2px}
+.evidence-status{font-size:11px;color:#53714e;margin:0;min-height:16px;line-height:1.5}
+.evidence-status[data-error="true"]{color:#9a483e}
+.vision-result{margin-top:16px;padding:14px 16px;border-left:2px solid #8d9d72;background:rgba(226,232,218,.5);text-align:left}
+.vision-label{font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:#536b55;margin:0 0 8px}
+.vision-content{font-size:12px;line-height:1.7;color:#5a6b59;margin:0}
+.vision-disclaimer{font-size:9px;color:#8a9588;margin:8px 0 0;font-style:italic}
+@media(max-width:600px){.evidence-area{padding:16px 15px;margin-top:20px}.photo-preview img{max-width:100%;max-height:160px}.photo-controls{gap:8px}.run-actions .button-primary{width:100%}}

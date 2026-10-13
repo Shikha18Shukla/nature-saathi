@@ -6,11 +6,17 @@
 
 **An AI-powered outdoor learning companion that turns an ordinary walk into a real-world nature expedition.**
 
+<<<<<<< HEAD
 ![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Backend-Flask-000000?logo=flask&logoColor=white)
 ![Ollama](https://img.shields.io/badge/AI-Ollama%20(local)-1f2937)
 ![Privacy](https://img.shields.io/badge/Data-No%20database%2C%20no%20uploads-2e7d32)
 ![Screen Time](https://img.shields.io/badge/Screen%20time-as%20short%20as%20possible-f59e0b)
+=======
+- Python 3.9 or newer
+- Ollama running locally, with the configured text model available
+- Pillow (installed automatically via `requirements.txt`) for image validation
+>>>>>>> 6d9061f (fix: improve Nature Saathi evidence and Ollama handling)
 
 [Quick Start](#-quick-start) · [How It Works](#-how-it-works) · [API](#-mission-generation-api) · [Tests](#-tests) · [Roadmap](#-roadmap)
 
@@ -100,7 +106,52 @@ python app.py
 | 🌍 The app | http://127.0.0.1:5000 |
 | 💚 Health check | http://127.0.0.1:5000/api/health |
 
+<<<<<<< HEAD
 ---
+=======
+### Optional: Local Vision Analysis
+
+Photo evidence can be analyzed by a local vision model to provide informational descriptions. Set `OLLAMA_VISION_MODEL` in `.env` to configure which model handles analysis:
+
+```env
+OLLAMA_VISION_MODEL=gemma3:4b
+```
+
+**Requirements**: The model must support image input. `gemma3:4b` supports vision natively — verify with:
+
+```powershell
+ollama show gemma3:4b
+```
+
+If the model does not support vision, or if Ollama is unavailable, vision analysis gracefully reports that it is unavailable and does not block photo evidence submission or mission completion.
+
+## Photo Evidence Workflow
+
+During an active expedition, each mission may require evidence before completion:
+
+- **Photo missions**: The user selects or captures a photo (JPEG, PNG, or WebP, up to 10 MB), previews it, and submits it as evidence. A photo mission cannot be marked complete until photo evidence has been submitted successfully.
+- **Reflection missions**: The user writes a short reflection about what they noticed. A reflection mission cannot be marked complete until a non-empty reflection has been submitted.
+- **Optional missions**: No evidence is required; the user can mark the mission complete directly.
+
+### Privacy and Temporary Photo Storage
+
+Photo data is kept in browser memory only for the active expedition. Photo bytes, Base64 strings, data URLs, and object URLs are never written to `localStorage` or `sessionStorage`. Photos are not saved to a database or disk. Photos are not sent to external APIs, third-party image services, cloud AI services, or analytics. Only the local Flask/Ollama setup is used for optional image analysis.
+
+On page refresh, the expedition progress is recovered from `sessionStorage`, but photo evidence for the current active mission must be reselected (photos are never persisted). Reflection text is preserved across refreshes. When the expedition ends or the page session closes, all photo references are released.
+
+### Vision Analysis Results
+
+When vision analysis succeeds, the result includes:
+
+- **Description**: A neutral description of what is visibly present.
+- **Possible identification**: A suggested identification, when appropriate.
+- **Observation**: A short observation or learning point.
+- **Uncertainty**: A note about ambiguity or uncertainty in the identification.
+
+Vision analysis is informational only. It is not proof that a mission was completed. Model output is treated as an untrusted suggestion, not verified fact. The app never claims an exact species identification without adequate evidence, and never tells users that an unfamiliar plant, mushroom, insect, or animal is safe to touch or eat.
+
+## Mission generation API
+>>>>>>> 6d9061f (fix: improve Nature Saathi evidence and Ollama handling)
 
 ## ⚙️ Configuration
 
@@ -147,6 +198,7 @@ The mission service validates everything the model returns. Malformed, incomplet
 
 **Success response** returns an expedition object with:
 
+<<<<<<< HEAD
 - `title`, `theme`, `duration_minutes`, `difficulty`
 - `intro` and `safety_note`
 - a list of `missions`, each with:
@@ -160,6 +212,17 @@ The mission service validates everything the model returns. Malformed, incomplet
 | `learning_note` | The "aha" fact to take home |
 | `evidence_type` | How you'll know you found it |
 | `difficulty` | Mission difficulty |
+=======
+## Evidence API
+
+`POST /api/evidence/photo` accepts multipart form data with a `file` field. Returns `200` on success, `400` for invalid images, `413` for oversized files.
+
+`POST /api/evidence/reflection` accepts JSON with a `text` field. Returns `200` on success, `400` for empty or invalid reflections.
+
+`POST /api/vision/analyze` accepts multipart form data with a `file` field. Returns `200` with analysis results, or `200` with `status: "unavailable"` if vision analysis is not available.
+
+## Running Tests
+>>>>>>> 6d9061f (fix: improve Nature Saathi evidence and Ollama handling)
 
 **Errors** always use one shape:
 
@@ -204,6 +267,7 @@ python -m unittest discover -s tests -v
 node tests/test_frontend_render.js
 ```
 
+<<<<<<< HEAD
 The frontend test covers **mission navigation, progress, completion, refresh recovery, and malformed mission data**. It is a logic check and does not replace a visual browser test.
 
 ---
@@ -265,3 +329,13 @@ Progress is stored per browser tab and cleared when the tab is closed. That's in
 *Now close the laptop. There's a bird out there waiting to be noticed.* 🐦
 
 </div>
+=======
+The Python tests cover mission generation, evidence validation, vision analysis, and Flask endpoints. The frontend test uses a small mocked DOM to cover mission navigation, progress, completion, refresh recovery, and malformed mission data. It does not replace a visual browser test.
+
+## Known Limitations
+
+- Photo evidence must be reselected after a page refresh (by design, for privacy).
+- Vision analysis requires a local Ollama model that supports image input.
+- AI-generated identifications are informational only and should be verified with reliable field guides or experts.
+- The frontend test's photo selection mock has limitations; the full photo flow should be tested in a real browser.
+>>>>>>> 6d9061f (fix: improve Nature Saathi evidence and Ollama handling)

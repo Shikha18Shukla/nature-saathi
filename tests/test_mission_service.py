@@ -72,7 +72,7 @@ class MissionGenerationServiceTests(unittest.TestCase):
     def test_valid_structured_response_is_returned(self):
         service, client = self.service_for(valid_expedition())
         result = service.generate(45, "Explorer", "Birds")
-        self.assertEqual(result["missions"][0]["evidence_type"], "sound")
+        self.assertEqual(result["missions"][0]["evidence_type"], "reflection")
         self.assertEqual(client.received_schema["type"], "object")
         self.assertIn("missions", client.received_schema["properties"])
 
@@ -138,6 +138,48 @@ class MissionGenerationServiceTests(unittest.TestCase):
         with self.assertRaises(MissionInputError):
             service.generate(20, "Explorer", "Birds")
         self.assertIsNone(client.received_schema)
+
+    def test_legacy_observation_evidence_is_normalized_to_reflection(self):
+        response = valid_expedition()
+        response["missions"][0]["evidence_type"] = "observation"
+        service, _ = self.service_for(response)
+        result = service.generate(45, "Explorer", "Birds")
+        self.assertEqual(result["missions"][0]["evidence_type"], "reflection")
+
+    def test_legacy_count_evidence_is_normalized_to_reflection(self):
+        response = valid_expedition()
+        response["missions"][0]["evidence_type"] = "count"
+        service, _ = self.service_for(response)
+        result = service.generate(45, "Explorer", "Birds")
+        self.assertEqual(result["missions"][0]["evidence_type"], "reflection")
+
+    def test_legacy_sound_evidence_is_normalized_to_reflection(self):
+        response = valid_expedition()
+        response["missions"][0]["evidence_type"] = "sound"
+        service, _ = self.service_for(response)
+        result = service.generate(45, "Explorer", "Birds")
+        self.assertEqual(result["missions"][0]["evidence_type"], "reflection")
+
+    def test_photo_evidence_is_preserved(self):
+        response = valid_expedition()
+        response["missions"][0]["evidence_type"] = "photo"
+        service, _ = self.service_for(response)
+        result = service.generate(45, "Explorer", "Birds")
+        self.assertEqual(result["missions"][0]["evidence_type"], "photo")
+
+    def test_invalid_evidence_type_falls_back_to_optional(self):
+        response = valid_expedition()
+        response["missions"][0]["evidence_type"] = "invalid_type"
+        service, _ = self.service_for(response)
+        result = service.generate(45, "Explorer", "Birds")
+        self.assertEqual(result["missions"][0]["evidence_type"], "optional")
+
+    def test_missing_evidence_type_falls_back_to_optional(self):
+        response = valid_expedition()
+        del response["missions"][0]["evidence_type"]
+        service, _ = self.service_for(response)
+        result = service.generate(45, "Explorer", "Birds")
+        self.assertEqual(result["missions"][0]["evidence_type"], "optional")
 
 
 if __name__ == "__main__":

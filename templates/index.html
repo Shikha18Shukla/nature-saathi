@@ -153,6 +153,31 @@
           <div class="run-detail"><h3>Learn</h3><p id="run-mission-learn"></p></div>
           <div class="phone-away-pause" aria-label="Put your phone away and explore"><span>LOOK UP</span><strong>Put your phone away.</strong><span>The world is waiting.</span></div>
           <p class="phone-away-note" id="run-reminder" role="status" aria-live="polite"></p>
+          <div class="evidence-area" id="evidence-area">
+            <p class="evidence-instruction" id="evidence-instruction"></p>
+            <div class="evidence-photo" id="evidence-photo" hidden>
+              <div class="photo-controls">
+                <label class="button-secondary photo-picker-label">Choose Photo<input type="file" id="photo-input" accept="image/jpeg,image/png,image/webp" class="visually-hidden"></label>
+                <label class="button-secondary photo-capture-label">Take Photo<input type="file" id="photo-capture" accept="image/jpeg,image/png,image/webp" capture="environment" class="visually-hidden"></label>
+              </div>
+              <div class="photo-preview" id="photo-preview" hidden>
+                <img id="photo-preview-img" alt="Preview of selected nature photo">
+                <button class="button-text" id="replace-photo" type="button">Replace photo</button>
+              </div>
+              <button class="button-primary" id="submit-photo" type="button" disabled>Submit Photo Evidence</button>
+              <p class="evidence-status" id="evidence-status" role="status" aria-live="polite"></p>
+            </div>
+            <div class="evidence-reflection" id="evidence-reflection" hidden>
+              <textarea id="reflection-input" placeholder="What did you notice? Write a sentence or two." rows="3"></textarea>
+              <button class="button-primary" id="submit-reflection" type="button">Submit Reflection</button>
+              <p class="evidence-status" id="reflection-status" role="status" aria-live="polite"></p>
+            </div>
+            <div class="vision-result" id="vision-result" hidden>
+              <p class="vision-label">Local AI observation</p>
+              <div class="vision-content" id="vision-content"></div>
+              <p class="vision-disclaimer">This is an AI suggestion, not a verified identification.</p>
+            </div>
+          </div>
         </article>
         <ol class="outside-rhythm" aria-label="Expedition rhythm"><li>Read</li><li>Phone away</li><li>Explore</li><li>Return</li></ol>
         <div class="run-actions">

@@ -16,8 +16,17 @@ Expedition design:
   require searching online or checking the phone repeatedly.
 - Give a concrete task, a detail to observe, and a modest learning idea for each mission.
 - Keep the activity gentle and accessible. Do not require special equipment.
-- Evidence is optional. Prefer observation, count, or sound. A photo may be suggested
-  only as an optional after-the-walk record, never as a requirement.
+- Evidence type rules:
+  - "photo": The mission can be demonstrated by a photograph (e.g., comparing leaf
+    shapes, observing flower colors, noticing bark textures). The user will be asked
+    to submit a photo after exploring.
+  - "reflection": The mission is best captured by a written reflection (e.g., listening
+    to sounds, noticing changes over time, counting observations). The user will be
+    asked to write a short reflection after exploring.
+  - "optional": No specific evidence is required. The user can mark the mission
+    complete directly.
+- Never require a photo of people, or anything that requires approaching or disturbing
+  wildlife. Never require the user to touch, collect, eat, or approach wildlife.
 - The numeric mission difficulty uses 1 (gentle) through 3 (most challenging).
 - Match `theme`, `duration_minutes`, and `difficulty` to the request exactly.
 
